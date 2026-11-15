@@ -1,0 +1,45 @@
+{
+  "name": "asciianything",
+  "version": "1.0.0",
+  "description": "Turn any video into a mosaic of coloured lowercase prose, frame-accurate, with ffmpeg.",
+  "keywords": [
+    "ascii",
+    "ascii-art",
+    "video",
+    "prose",
+    "text-art",
+    "typography",
+    "ffmpeg",
+    "terminal"
+  ],
+  "license": "MIT",
+  "author": "sloemo01",
+  "type": "commonjs",
+  "main": "src/render.js",
+  "bin": {
+    "asciianything": "src/cli.js"
+  },
+  "files": [
+    "src",
+    "assets/JetBrainsMono-Variable.ttf",
+    "assets/prose.json",
+    "assets/OFL.txt"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node src/cli.js"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^1.1.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sloemo01/asciianything.git"
+  },
+  "homepage": "https://github.com/sloemo01/asciianything#readme",
+  "bugs": {
+    "url": "https://github.com/sloemo01/asciianything/issues"
+  }
+}

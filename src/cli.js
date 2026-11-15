@@ -1,0 +1,285 @@
+#!/usr/bin/env node
+'use strict';
+
+const fs = require('node:fs');
+const path = require('node:path');
+const { spawn, spawnSync } = require('node:child_process');
+const { parseArgs } = require('node:util');
+const { createCanvas } = require('@napi-rs/canvas');
+const { Renderer } = require('./render');
+
+const HELP = `
+asciianything — turn a video into a mosaic of coloured lowercase prose.
+
+usage:
+  asciianything <input.mp4> [-o output.mp4] [options]
+
+options:
+  -o, --out <file>        output video (default: <input>-ascii.mp4)
+  --font-size <px>        glyph size in output pixels (default 20)
+  --cell-ratio <r>        cell height / font size (default 1.12)
+  --weights <a,b,..>      font weights used (default 400,500,600,700,800)
+  --weight-min <n>        lightest weight for dark cells (default 600)
+  --weight-max <n>        heaviest weight for bright cells (default 800)
+  --stroke <px>           extra glyph stroke in output pixels (default 0.5)
+  --calibration <n>       ink-coverage calibration (default 0.86)
+  --diffusion <n>         base ink softening, 0..1 (default 0.1)
+  --diffusion-adaptive    extra softening for bright cells (default 0.25)
+  --detail <n>            subcell luminance detail recovery (default 0.14)
+  --color-detail <n>      subcell colour recovery (default 0.1)
+  --prose <file>          sentence bank (.txt or .json) instead of the bundled one
+  --crf <n>               x264 quality, lower is better (default 17)
+  --preset <name>         x264 preset (default slow)
+  --still <seconds>       render one frame to PNG instead of the whole video
+  --limit <n>             only render the first n frames (preview)
+  --info                  print grid and coverage stats, then exit
+  -q, --quiet             no progress output
+  -h, --help              show this help
+
+requires ffmpeg and ffprobe on PATH.
+`.trim();
+
+function fail(msg) {
+  console.error(`asciianything: ${msg}`);
+  process.exit(1);
+}
+
+function which(bin) {
+  const res = spawnSync(bin, ['-version'], { stdio: 'ignore' });
+  if (res.error || res.status !== 0) {
+    fail(`${bin} not found. Install ffmpeg (brew install ffmpeg / apt install ffmpeg) and try again.`);
+  }
+}
+
+function probe(file) {
+  const res = spawnSync(
+    'ffprobe',
+    [
+      '-v', 'error', '-select_streams', 'v:0',
+      '-show_entries', 'stream=width,height,r_frame_rate,avg_frame_rate,nb_frames,duration',
+      '-of', 'json', file,
+    ],
+    { encoding: 'utf8' }
+  );
+  if (res.status !== 0) fail(`ffprobe failed on ${file}`);
+  const info = JSON.parse(res.stdout).streams[0];
+  const rate = info.avg_frame_rate && info.avg_frame_rate !== '0/0' ? info.avg_frame_rate : info.r_frame_rate;
+  const [num, den] = rate.split('/').map(Number);
+  return {
+    width: info.width,
+    height: info.height,
+    rate,
+    fps: num / den,
+    frames: Number(info.nb_frames) || 0,
+    duration: Number(info.duration) || 0,
+  };
+}
+
+async function* readFrames(stream, frameBytes) {
+  const buf = Buffer.allocUnsafe(frameBytes);
+  let fill = 0;
+  for await (const chunk of stream) {
+    let off = 0;
+    while (off < chunk.length) {
+      const take = Math.min(frameBytes - fill, chunk.length - off);
+      chunk.copy(buf, fill, off, off + take);
+      fill += take;
+      off += take;
+      if (fill === frameBytes) {
+        yield buf;
+        fill = 0;
+      }
+    }
+  }
+}
+
+function writeFrame(stream, buf, proc) {
+  if (stream.write(buf)) return null;
+  return new Promise((resolve, reject) => {
+    const cleanup = () => {
+      stream.off('drain', onDrain);
+      proc.off('exit', onExit);
+    };
+    const onDrain = () => {
+      cleanup();
+      resolve();
+    };
+    const onExit = (code) => {
+      cleanup();
+      reject(new Error(`encoder exited with code ${code}`));
+    };
+    stream.once('drain', onDrain);
+    proc.once('exit', onExit);
+  });
+}
+
+async function main() {
+  let parsed;
+  try {
+    parsed = parseArgs({
+      allowPositionals: true,
+      options: {
+        out: { type: 'string', short: 'o' },
+        'font-size': { type: 'string' },
+        'cell-ratio': { type: 'string' },
+        weights: { type: 'string' },
+        'weight-min': { type: 'string' },
+        'weight-max': { type: 'string' },
+        stroke: { type: 'string' },
+        calibration: { type: 'string' },
+        diffusion: { type: 'string' },
+        'diffusion-adaptive': { type: 'string' },
+        detail: { type: 'string' },
+        'color-detail': { type: 'string' },
+        prose: { type: 'string' },
+        crf: { type: 'string' },
+        preset: { type: 'string' },
+        still: { type: 'string' },
+        limit: { type: 'string' },
+        info: { type: 'boolean' },
+        quiet: { type: 'boolean', short: 'q' },
+        help: { type: 'boolean', short: 'h' },
+      },
+    });
+  } catch (err) {
+    fail(err.message);
+  }
+
+  const { values, positionals } = parsed;
+  if (values.help || positionals.length === 0) {
+    console.log(HELP);
+    process.exit(0);
+  }
+
+  which('ffmpeg');
+  which('ffprobe');
+
+  const input = positionals[0];
+  if (!fs.existsSync(input)) fail(`no such file: ${input}`);
+  const meta = probe(input);
+  const quiet = !!values.quiet;
+
+  const num = (v, d) => (v === undefined ? d : Number(v));
+  const cfg = {
+    width: meta.width,
+    height: meta.height,
+    fontSize: num(values['font-size'], 20),
+    cellRatio: num(values['cell-ratio'], 1.12),
+    weights: values.weights
+      ? values.weights.split(',').map((v) => Number(v.trim()))
+      : [400, 500, 600, 700, 800],
+    weightMin: num(values['weight-min'], 600),
+    weightMax: num(values['weight-max'], 800),
+    stroke: num(values.stroke, 0.5),
+    calibration: num(values.calibration, 0.86),
+    diffusion: num(values.diffusion, 0.1),
+    diffusionAdaptive: num(values['diffusion-adaptive'], 0.25),
+    detailLuma: num(values.detail, 0.14),
+    detailColor: num(values['color-detail'], 0.1),
+    prosePath: values.prose,
+  };
+
+  const t0 = Date.now();
+  const renderer = new Renderer(cfg);
+  const stats = renderer.stats();
+  if (!quiet) {
+    console.error(
+      `grid ${stats.grid[0]}x${stats.grid[1]} (${stats.cells} cells), ` +
+        `glyph ${stats.fontSize}px on ${stats.cell[0]}x${stats.cell[1]}px cells, ` +
+        `${stats.sentences} sentences, ready in ${((Date.now() - t0) / 1000).toFixed(2)}s`
+    );
+  }
+  if (values.info) {
+    console.log(JSON.stringify(stats, null, 2));
+    return;
+  }
+
+  if (values.still !== undefined) {
+    const at = Number(values.still);
+    const png = await renderStill(input, at, renderer, meta);
+    const out = values.out || `${path.basename(input, path.extname(input))}-ascii.png`;
+    fs.writeFileSync(out, png);
+    if (!quiet) console.error(`wrote ${out}`);
+    return;
+  }
+
+  const out = values.out || `${path.basename(input, path.extname(input))}-ascii.mp4`;
+  const limit = values.limit ? Number(values.limit) : 0;
+
+  const decoder = spawn(
+    'ffmpeg',
+    ['-v', 'error', '-i', input, '-f', 'rawvideo', '-pix_fmt', 'rgba', '-'],
+    { stdio: ['ignore', 'pipe', 'pipe'] }
+  );
+  let decodeErr = '';
+  decoder.stderr.on('data', (d) => {
+    decodeErr += d.toString();
+  });
+
+  const encoder = spawn(
+    'ffmpeg',
+    [
+      '-hide_banner', '-loglevel', 'error', '-y',
+      '-f', 'rawvideo', '-pix_fmt', 'rgb24',
+      '-s', `${meta.width}x${meta.height}`, '-r', meta.rate, '-i', '-',
+      '-vf', 'scale=out_color_matrix=bt709',
+      '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv',
+      '-an', '-c:v', 'libx264', '-preset', values.preset || 'slow',
+      '-crf', String(num(values.crf, 17)), '-pix_fmt', 'yuv420p',
+      '-movflags', '+faststart', out,
+    ],
+    { stdio: ['pipe', 'inherit', 'inherit'] }
+  );
+
+  const frameBytes = meta.width * meta.height * 4;
+  let count = 0;
+  const started = Date.now();
+
+  try {
+    for await (const frame of readFrames(decoder.stdout, frameBytes)) {
+      const rgb = renderer.renderFrame(frame);
+      const pending = writeFrame(encoder.stdin, Buffer.from(rgb.buffer, rgb.byteOffset, rgb.length), encoder);
+      if (pending) await pending;
+      count++;
+      if (!quiet && count % 20 === 0) {
+        const elapsed = (Date.now() - started) / 1000;
+        console.error(`frame ${count}  ${(count / elapsed).toFixed(2)} fps`);
+      }
+      if (limit && count >= limit) break;
+    }
+    encoder.stdin.end();
+    const code = await new Promise((resolve) => encoder.on('close', resolve));
+    if (code !== 0) fail(`encoder exited with ${code}`);
+    if (decodeErr.trim() && !limit) fail(`decoder reported: ${decodeErr.split('\n')[0]}`);
+  } finally {
+    decoder.kill();
+  }
+
+  if (!quiet) {
+    const size = (fs.statSync(out).size / 1e6).toFixed(1);
+    console.error(`rendered ${count} frames in ${((Date.now() - started) / 60000).toFixed(1)} min -> ${out} (${size} MB)`);
+  }
+}
+
+async function renderStill(input, at, renderer, meta) {
+  const res = spawnSync(
+    'ffmpeg',
+    ['-v', 'error', '-ss', String(at), '-i', input, '-frames:v', '1', '-f', 'rawvideo', '-pix_fmt', 'rgba', '-'],
+    { maxBuffer: meta.width * meta.height * 4 * 2 }
+  );
+  if (res.status !== 0) fail('could not decode the frame for --still');
+  const rgb = renderer.renderFrame(new Uint8ClampedArray(res.stdout));
+  const canvas = createCanvas(meta.width, meta.height);
+  const ctx = canvas.getContext('2d');
+  const img = ctx.createImageData(meta.width, meta.height);
+  for (let i = 0, j = 0; i < rgb.length; i += 3, j += 4) {
+    img.data[j] = rgb[i];
+    img.data[j + 1] = rgb[i + 1];
+    img.data[j + 2] = rgb[i + 2];
+    img.data[j + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+  return canvas.toBuffer('image/png');
+}
+
+main().catch((err) => fail(err.stack || String(err)));
