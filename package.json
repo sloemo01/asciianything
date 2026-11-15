@@ -1,6 +1,6 @@
 {
   "name": "asciianything",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Turn any video into a mosaic of coloured lowercase prose, frame-accurate, with ffmpeg.",
   "keywords": [
     "ascii",
@@ -23,7 +23,8 @@
     "src",
     "assets/JetBrainsMono-Variable.ttf",
     "assets/prose.json",
-    "assets/OFL.txt"
+    "assets/OFL.txt",
+    "CREDITS.md"
   ],
   "engines": {
     "node": ">=18"

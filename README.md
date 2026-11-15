@@ -161,9 +161,11 @@ as a poster and are legible from across a room.
 Night highway footage: [Night Traffic Flow in Urban Highway View](https://www.pexels.com/video/night-traffic-flow-in-urban-highway-view-35835506/)
 by [Sururi Ballıdağ](https://www.pexels.com/@drector/), used under the [Pexels license](https://www.pexels.com/license/).
 
-Sunset footage: Pexels clip `12556562`, used under the [Pexels license](https://www.pexels.com/license/).
+Sunset footage: [Stunning Beach Sunset with Vibrant Colors](https://www.pexels.com/video/stunning-beach-sunset-with-vibrant-colors-29045884/) by [Manoo Media](https://www.pexels.com/@manoo-media-65214113/), used under the [Pexels license](https://www.pexels.com/license/).
 
 Bundled typeface: [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono), SIL OFL 1.1 — see `assets/OFL.txt`.
+
+Full sourcing and licence notes: [CREDITS.md](CREDITS.md).
 
 ## Licence
 
