@@ -156,6 +156,54 @@ class Renderer {
 
     this.rgb = new Uint8Array(this.width * this.height * 3);
     this.alpha = new Float32Array(this.width * this.height);
+
+    // highlight halo: light the ink cannot carry is re-emitted as a local
+    // glow shaped by the glyph itself, so a sun or a specular path keeps the
+    // energy the source has instead of topping out at the coverage ceiling.
+    this.halo = cfg.halo === undefined ? 0 : cfg.halo;
+    this.haloRadius = Math.max(
+      1,
+      Math.round(cfg.haloRadius === undefined ? this.cellw * 0.9 : cfg.haloRadius)
+    );
+    this.haloGain = new Float32Array(this.cells * 3);
+    this.sumR = new Float32Array(this.cells);
+    this.sumG = new Float32Array(this.cells);
+    this.sumB = new Float32Array(this.cells);
+    this.count = new Uint16Array(this.cells);
+    this.glowBuf = this.halo > 0 ? new Float32Array(this.width * this.height * 3) : null;
+    if (this.halo > 0) this._buildGlowTiles();
+  }
+
+  /** Pre-blurred glyph tiles, used to scatter each clipped cell's lost light. */
+  _buildGlowTiles() {
+    const R = this.haloRadius;
+    const gw = this.cellw + 2 * R;
+    const gh = this.cellh + 2 * R;
+    const n = this.atlas.weights.length * this.atlas.chars.length;
+    this.glowTiles = new Float32Array(n * gw * gh);
+    this.glowW = gw;
+    this.glowH = gh;
+
+    const tile = new Float32Array(gw * gh);
+    const tmp = new Float32Array(gw * gh);
+    const atile = this.atlas;
+    for (let wi = 0; wi < atile.weights.length; wi++) {
+      for (let ci = 0; ci < atile.chars.length; ci++) {
+        const src = (wi * atile.chars.length + ci) * atile.area;
+        tile.fill(0);
+        if (atile.chars[ci] !== ' ') {
+          for (let y = 0; y < this.cellh; y++) {
+            const srow = src + (atile.pad + y) * atile.tilew + atile.pad;
+            const drow = (y + R) * gw + R;
+            for (let x = 0; x < this.cellw; x++) tile[drow + x] = atile.alpha[srow + x];
+          }
+        }
+        // two separable box passes -> soft bloom with the cell's own shape
+        boxBlurR(tile, tmp, gw, gh, Math.max(1, R >> 1));
+        boxBlurR(tmp, tile, gw, gh, Math.max(1, R >> 1));
+        this.glowTiles.set(tile, (wi * atile.chars.length + ci) * gw * gh);
+      }
+    }
   }
 
   stats() {
@@ -292,9 +340,16 @@ class Renderer {
       }
 
       this.wgrid[c] = wi;
-      this.colors[c * 3] = Math.min(gr, maxEmitted);
-      this.colors[c * 3 + 1] = Math.min(gg, maxEmitted);
-      this.colors[c * 3 + 2] = Math.min(gb, maxEmitted);
+      // a space carries no ink: emit nothing rather than dividing by the floor
+      if (ch === 0) {
+        this.colors[c * 3] = 0;
+        this.colors[c * 3 + 1] = 0;
+        this.colors[c * 3 + 2] = 0;
+      } else {
+        this.colors[c * 3] = Math.min(gr, maxEmitted);
+        this.colors[c * 3 + 1] = Math.min(gg, maxEmitted);
+        this.colors[c * 3 + 2] = Math.min(gb, maxEmitted);
+      }
     }
   }
 
@@ -325,6 +380,9 @@ class Renderer {
       }
     }
 
+    let glow = null;
+    if (this.halo > 0) glow = this._halo();
+
     for (let i = 0; i < px; i++) {
       const cell = cellId[i];
       const ink = a[i];
@@ -334,6 +392,12 @@ class Renderer {
       let r = ink * cr;
       let g = ink * cg;
       let b = ink * cb;
+      if (glow) {
+        const o3 = i * 3;
+        r += glow[o3];
+        g += glow[o3 + 1];
+        b += glow[o3 + 2];
+      }
       const y = LUMA_R * r + LUMA_G * g + LUMA_B * b;
       r = y + (r - y) * sat;
       g = y + (g - y) * sat;
@@ -348,6 +412,84 @@ class Renderer {
     }
     return out;
   }
+
+  /**
+   * Measure what each cell's ink actually delivers, and re-emit the shortfall
+   * as a bloom shaped by the glyph. Only cells whose source light exceeds what
+   * their coverage can carry contribute, so smooth sky is untouched.
+   */
+  _halo() {
+    const { cols, rows, cellw, cellh, cellId, colors, chars, wgrid } = this;
+    const a = this.alpha;
+    const px = this.width * this.height;
+    const sumR = this.sumR, sumG = this.sumG, sumB = this.sumB, count = this.count;
+    const gains = this.haloGain;
+    sumR.fill(0); sumG.fill(0); sumB.fill(0); count.fill(0);
+
+    for (let i = 0; i < px; i++) {
+      const c = cellId[i];
+      const ink = a[i];
+      sumR[c] += Math.min(ink * colors[c * 3], 1);
+      sumG[c] += Math.min(ink * colors[c * 3 + 1], 1);
+      sumB[c] += Math.min(ink * colors[c * 3 + 2], 1);
+      count[c]++;
+    }
+
+    const calib = this.calibration;
+    const nw = this.atlas.chars.length;
+    const cov = this.atlas.coverage;
+    let any = false;
+    for (let c = 0; c < this.cells; c++) {
+      const n = count[c] || 1;
+      if (chars[c] === 0) {
+        gains[c * 3] = 0; gains[c * 3 + 1] = 0; gains[c * 3 + 2] = 0;
+        continue;
+      }
+      const C = Math.max(cov[wgrid[c] * nw + chars[c]], 0.02);
+      const wantR = this.sceneRGB[c * 3] / calib;
+      const wantG = this.sceneRGB[c * 3 + 1] / calib;
+      const wantB = this.sceneRGB[c * 3 + 2] / calib;
+      const defR = wantR - sumR[c] / n;
+      const defG = wantG - sumG[c] / n;
+      const defB = wantB - sumB[c] / n;
+      const gR = defR > 0 ? (this.halo * defR) / C : 0;
+      const gG = defG > 0 ? (this.halo * defG) / C : 0;
+      const gB = defB > 0 ? (this.halo * defB) / C : 0;
+      gains[c * 3] = gR; gains[c * 3 + 1] = gG; gains[c * 3 + 2] = gB;
+      if (gR > 0 || gG > 0 || gB > 0) any = true;
+    }
+
+    const glow = this.glowBuf;
+    glow.fill(0);
+    if (!any) return glow;
+
+    const gw = this.glowW, gh = this.glowH, R = this.haloRadius, W = this.width, H = this.height;
+    for (let c = 0; c < this.cells; c++) {
+      const gR = gains[c * 3], gG = gains[c * 3 + 1], gB = gains[c * 3 + 2];
+      if (gR === 0 && gG === 0 && gB === 0) continue;
+      const tile = this.glowTiles.subarray(
+        (wgrid[c] * nw + chars[c]) * gw * gh,
+        (wgrid[c] * nw + chars[c] + 1) * gw * gh
+      );
+      const cx = (c % cols) * cellw - R;
+      const cy = ((c / cols) | 0) * cellh - R;
+      const y0 = Math.max(0, -cy), y1 = Math.min(gh, H - cy);
+      const x0 = Math.max(0, -cx), x1 = Math.min(gw, W - cx);
+      for (let y = y0; y < y1; y++) {
+        const row = (cy + y) * W;
+        const trow = y * gw;
+        for (let x = x0; x < x1; x++) {
+          const t = tile[trow + x];
+          if (t === 0) continue;
+          const o = (row + cx + x) * 3;
+          glow[o] += gR * t;
+          glow[o + 1] += gG * t;
+          glow[o + 2] += gB * t;
+        }
+      }
+    }
+    return glow;
+  }
 }
 
 function buildOutputLUT(n = 4096) {
@@ -358,6 +500,38 @@ function buildOutputLUT(n = 4096) {
     lut[i] = Math.round(Math.max(0, Math.min(1, s)) * 255);
   }
   return lut;
+}
+
+/** separable box blur of radius r, energy preserving with edge clamping */
+function boxBlurR(src, dst, width, height, r) {
+  if (r < 1) {
+    dst.set(src);
+    return dst;
+  }
+  const norm = 1 / (2 * r + 1);
+  const tmp = new Float32Array(src.length);
+  for (let y = 0; y < height; y++) {
+    const row = y * width;
+    let sum = 0;
+    for (let k = -r; k <= r; k++) sum += src[row + Math.min(width - 1, Math.max(0, k))];
+    for (let x = 0; x < width; x++) {
+      tmp[row + x] = sum * norm;
+      const add = Math.min(width - 1, x + r + 1);
+      const sub = Math.max(0, x - r);
+      sum += src[row + add] - src[row + sub];
+    }
+  }
+  for (let x = 0; x < width; x++) {
+    let sum = 0;
+    for (let k = -r; k <= r; k++) sum += tmp[Math.min(height - 1, Math.max(0, k)) * width + x];
+    for (let y = 0; y < height; y++) {
+      dst[y * width + x] = sum * norm;
+      const add = Math.min(height - 1, y + r + 1);
+      const sub = Math.max(0, y - r);
+      sum += tmp[add * width + x] - tmp[sub * width + x];
+    }
+  }
+  return dst;
 }
 
 /** separable 1-2-1 blur over a float image, energy preserving */

@@ -25,6 +25,8 @@ options:
   --calibration <n>       ink-coverage calibration (default 0.86)
   --diffusion <n>         base ink softening, 0..1 (default 0.1)
   --diffusion-adaptive    extra softening for bright cells (default 0.25)
+  --halo <n>              highlight halo for light the ink cannot carry (default 0)
+  --halo-radius <px>      halo blur radius (default 0.9 x cell width)
   --detail <n>            subcell luminance detail recovery (default 0.14)
   --color-detail <n>      subcell colour recovery (default 0.1)
   --prose <file>          sentence bank (.txt or .json) instead of the bundled one
@@ -129,6 +131,8 @@ async function main() {
         calibration: { type: 'string' },
         diffusion: { type: 'string' },
         'diffusion-adaptive': { type: 'string' },
+        halo: { type: 'string' },
+        'halo-radius': { type: 'string' },
         detail: { type: 'string' },
         'color-detail': { type: 'string' },
         prose: { type: 'string' },
@@ -174,6 +178,8 @@ async function main() {
     calibration: num(values.calibration, 0.86),
     diffusion: num(values.diffusion, 0.1),
     diffusionAdaptive: num(values['diffusion-adaptive'], 0.25),
+    halo: num(values.halo, 0),
+    haloRadius: values['halo-radius'] === undefined ? undefined : num(values['halo-radius'], 0),
     detailLuma: num(values.detail, 0.14),
     detailColor: num(values['color-detail'], 0.1),
     prosePath: values.prose,
