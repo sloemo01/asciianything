@@ -1,6 +1,6 @@
 {
   "name": "asciianything",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Turn any video into a mosaic of coloured lowercase prose, frame-accurate, with ffmpeg.",
   "keywords": [
     "ascii",

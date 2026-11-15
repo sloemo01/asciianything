@@ -97,6 +97,10 @@ Rendering is deterministic: same input frame and settings produce the same outpu
 
 Large glyphs mean fewer cells, and a cell can only average as bright as its ink coverage allows. Very bright, very large highlights (a full-white sky at `--font-size 32`) will top out below the source; lowering `--calibration` brightens the whole mosaic, raising it darkens it. Small font sizes preserve more detail and read as a finer texture.
 
+## Credits
+
+Demo footage: [Night Traffic Flow in Urban Highway View](https://www.pexels.com/video/night-traffic-flow-in-urban-highway-view-35835506/) by [Sururi Ballıdağ](https://www.pexels.com/@drector/), used under the [Pexels license](https://www.pexels.com/license/). `assets/demo.mp4` is the ASCII derivative of that clip.
+
 ## Licence
 
 MIT for the code. The bundled JetBrains Mono font is SIL OFL 1.1 — see `assets/OFL.txt`.
