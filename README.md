@@ -9,7 +9,6 @@
 [![Watchers](https://img.shields.io/github/watchers/sloemo01/asciianything?style=flat-square&color=1d1d1f&label=watchers)](https://github.com/sloemo01/asciianything/watchers)
 [![License](https://img.shields.io/github/license/sloemo01/asciianything?style=flat-square&color=1d1d1f)](LICENSE)
 [![npm](https://img.shields.io/npm/v/asciianything?style=flat-square&color=1d1d1f&logo=npm&logoColor=white)](https://www.npmjs.com/package/asciianything)
-[![downloads](https://img.shields.io/npm/dm/asciianything?style=flat-square&color=1d1d1f&label=downloads)](https://www.npmjs.com/package/asciianything)
 [![node](https://img.shields.io/badge/node-%E2%89%A518-1d1d1f?style=flat-square)](package.json)
 
 <p>
