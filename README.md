@@ -12,17 +12,15 @@
 [![node](https://img.shields.io/badge/node-%E2%89%A518-1d1d1f?style=flat-square)](package.json)
 
 <p>
-<a href="https://cdn.jsdelivr.net/gh/sloemo01/asciianything@main/assets/night-highway-1080p.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/night-highway-1080p.jpg" width="48%" alt="Night highway in ASCII prose, 1920x1080"></a>
-<a href="https://cdn.jsdelivr.net/gh/sloemo01/asciianything@main/assets/sunset-ascii.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/sunset.jpg" width="48%" alt="Sunset in ASCII prose, 3840x2160 at 60 fps"></a>
-</p>
-<p>
-<a href="https://cdn.jsdelivr.net/gh/sloemo01/asciianything@main/assets/aurora-harbour-1080p.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/aurora-harbour-1080p.jpg" width="48%" alt="Aurora over a fishing harbour in ASCII prose, 1920x1080"></a>
-<a href="https://cdn.jsdelivr.net/gh/sloemo01/asciianything@main/assets/new-york-1080p.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/new-york-1080p.jpg" width="48%" alt="New York skyline with fireworks in ASCII prose, 1920x1080"></a>
+<a href="https://cdn.jsdelivr.net/gh/sloemo01/asciianything@main/assets/night-highway-1080p.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/night-highway-1080p.jpg" width="24%" alt="Night highway in ASCII prose, 1920x1080"></a>
+<a href="https://cdn.jsdelivr.net/gh/sloemo01/asciianything@main/assets/sunset-ascii.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/sunset.jpg" width="24%" alt="Sunset in ASCII prose, 3840x2160 at 60 fps"></a>
+<a href="https://cdn.jsdelivr.net/gh/sloemo01/asciianything@main/assets/aurora-harbour-1080p.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/aurora-harbour-1080p.jpg" width="24%" alt="Aurora over a fishing harbour in ASCII prose, 1920x1080"></a>
+<a href="https://cdn.jsdelivr.net/gh/sloemo01/asciianything@main/assets/new-york-1080p.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/new-york-1080p.jpg" width="24%" alt="New York skyline with fireworks in ASCII prose, 1920x1080"></a>
 </p>
 
 <sub><b>Night highway</b>, 19.4 s, 1920×1080 &nbsp;·&nbsp; <b>Sunset</b>, 11.6 s, 3840×2160·60 &nbsp;·&nbsp; <b>Aurora</b>, 7.6 s, 1920×1080 &nbsp;·&nbsp; <b>New York</b>, 16.0 s, 1920×1080</sub>
 
-<sub>Four clips rendered by this package — the same command that turns a still photo into a PNG or a folder of three.js frames into a clip. Click a tile to play: GitHub refuses to inline video in the blob view at any size, so the tiles stream the 7–8 MB copies from <code>assets/</code> through jsDelivr. The full-quality renders use the settings in <a href="#demos">Demos</a>.</sub>
+<sub>Four clips rendered by this package — the same command that turns a still photo into a PNG or a folder of three.js frames into a clip. Click a tile to play; GitHub won't inline video in the blob view, so they stream from <code>assets/</code> through jsDelivr.</sub>
 
 [**Install it**](#install-it) &nbsp;·&nbsp; [**Run it**](#run-it) &nbsp;·&nbsp; [What is in here](#what-is-in-here) &nbsp;·&nbsp; [How it works](#how-it-works) &nbsp;·&nbsp; [Verification](#verification) &nbsp;·&nbsp; [Credits](#credits)
 
@@ -36,9 +34,9 @@ This is not an `@%#*+=-:.` brightness ramp, and it is not text laid over a pictu
 frame comes out, and the only things that change between frames are scene colour, sampled luminance, glyph weight and
 emitted colour. No zoom, pan, transition, grain or vignette is ever added.
 
-![the source frame above, the same crop rendered in prose below, 1:1](https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/sunset-comparison.jpg)
+![the source crop on the left, the same crop in prose on the right, 1:1](https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/sunset-comparison.jpg?v=2)
 
-<sub><b>Top:</b> the source frame. <b>Bottom:</b> the same 880×495 crop rendered, at 1:1 — every letter readable, no downscale.</sub>
+<sub><b>Left:</b> the source frame. <b>Right:</b> the same 440×248 crop rendered, at 1:1 — every letter readable, no downscale.</sub>
 
 ## What it converts
 
