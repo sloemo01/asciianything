@@ -1,7 +1,7 @@
 {
   "name": "asciianything",
-  "version": "1.1.5",
-  "description": "Turn any video into a mosaic of coloured lowercase prose, frame-accurate, with ffmpeg.",
+  "version": "1.2.0",
+  "description": "Turn a 3D scene, a video or a photo into a mosaic of coloured lowercase prose \u2014 frame-accurate, with ffmpeg.",
   "keywords": [
     "ascii",
     "ascii-art",
@@ -10,7 +10,11 @@
     "text-art",
     "typography",
     "ffmpeg",
-    "terminal"
+    "terminal",
+    "three.js",
+    "photo",
+    "image",
+    "render"
   ],
   "license": "MIT",
   "author": "sloemo01",

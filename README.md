@@ -2,7 +2,7 @@
 
 # asciianything
 
-**A video rebuilt from coloured lowercase prose. One command, every frame, at the source's own resolution and frame rate.**
+**A 3D scene, a video, a photo — anything with pixels, rebuilt from coloured lowercase prose. One command, at the source's own resolution and frame rate.**
 
 [![Stars](https://img.shields.io/github/stars/sloemo01/asciianything?style=flat-square&color=1d1d1f&logo=github&label=stars)](https://github.com/sloemo01/asciianything/stargazers)
 [![Forks](https://img.shields.io/github/forks/sloemo01/asciianything?style=flat-square&color=1d1d1f&label=forks)](https://github.com/sloemo01/asciianything/forks)
@@ -18,28 +18,44 @@
 
 <sub><b>Night highway</b>, 19.4 s, 1920×1080 &nbsp;·&nbsp; <b>Sunset</b>, 11.6 s, 3840×2160·60</sub>
 
-<sub>Two clips rendered by this package. Click a tile for the MP4.</sub>
+<sub>Two clips rendered by this package — the same command that turns a still photo into a PNG or a folder of three.js frames into a clip.</sub>
 
 [**Install it**](#install-it) &nbsp;·&nbsp; [**Run it**](#run-it) &nbsp;·&nbsp; [What is in here](#what-is-in-here) &nbsp;·&nbsp; [How it works](#how-it-works) &nbsp;·&nbsp; [Verification](#verification) &nbsp;·&nbsp; [Credits](#credits)
 
 </div>
 
 Every cell of the picture holds one stable English character. Close up it is lowercase prose you can read; at normal
-viewing distance the same cells add up to the footage — same framing, same colour, same exposure, same motion. Nothing is
-painted under the letters: all visible structure comes from glyph ink, weight and colour.
+viewing distance the same cells add up to the source — same framing, same colour, same exposure, and for moving inputs the
+same motion. Nothing is painted under the letters: all visible structure comes from glyph ink, weight and colour.
 
-This is not an `@%#*+=-:.` brightness ramp, and it is not text laid over a video. One source frame goes in, one rendered
+This is not an `@%#*+=-:.` brightness ramp, and it is not text laid over a picture. One source frame goes in, one rendered
 frame comes out, and the only things that change between frames are scene colour, sampled luminance, glyph weight and
 emitted colour. No zoom, pan, transition, grain or vignette is ever added.
 
 ![source and output, same frame](https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/sunset-comparison.jpg)
 
+## What it converts
+
+| input | command | output |
+| --- | --- | --- |
+| video — mp4, mov, webm, gif, anything ffmpeg decodes | `asciianything clip.mp4` | `clip-ascii.mp4` |
+| photo — png, jpg, webp, avif, tiff, bmp | `asciianything shot.jpg` | `shot-ascii.png` |
+| frame sequence — a folder of numbered PNGs | `asciianything frames/ --fps 60` | `frames-ascii.mp4` |
+
+**3D scenes.** A three.js scene is a frame sequence waiting to happen: render it to PNGs (`renderer.render()` in a loop
+behind Puppeteer or Playwright, or any headless capture), then point the tool at the folder. Frame rate is yours to set
+with `--fps`; resolution comes from the frames. The same path handles Blender renders, stop-motion stills, screen
+recordings split to frames, and anything else that can write `0001.png`.
+
+A single photo is rendered and encoded as one PNG — the still path shares the renderer, the atlas and the calibration
+with the video path, so a photo and a frame of a clip at the same size match exactly.
+
 ## What it is
 
-A small Node CLI around a deterministic renderer.
+A small Node CLI around a deterministic renderer, for video, stills and frame sequences alike.
 
 - **Prose, not noise.** A sentence bank is shuffled per row with a deterministic hash: every row is a different slice of
-  the bank, no row repeats the row above it, and each cell keeps the same character for the whole video.
+  the bank, no row repeats the row above it, and each cell keeps the same character for the whole input.
 - **Fidelity first.** One fixed cover transform, one fixed grid, one rendered frame per decoded source frame. Frame
   count, duration, resolution and frame rate are probed from the source and reproduced exactly.
 - **Linear light.** sRGB is decoded before any averaging, compensation or comparison, and encoded once on the way out.
@@ -52,7 +68,7 @@ Paste this into an agent that can run shell commands. It installs the published 
 reports what it measured before rendering anything for you.
 
 ```text
-Install asciianything from npm, verify it, then render a video.
+Install asciianything from npm, verify it, then convert a clip or a still.
 
 1. Confirm node 18+ and ffmpeg/ffprobe are on PATH. If either is missing, give
    me the install command for my platform and stop.
@@ -64,8 +80,9 @@ Install asciianything from npm, verify it, then render a video.
    step fails, say so and stop. Never describe the tool from memory.
 4. Report in this order: version, grid and glyph size, encoder flags, then three
    rules from "How it works" with the section each came from.
-5. Ask me for the video and the font size once, render it, and probe the output
-   with ffprobe next to the source: frames, duration, resolution.
+5. Ask me for the input (video, photo, or a folder of frames) and the font size
+   once, render it, and probe the output next to the source: frames, duration,
+   resolution.
 ```
 
 ```bash
@@ -89,10 +106,13 @@ Update asciianything, then report what changed.
 ## Run it
 
 ```bash
-npx asciianything night-drive.mp4
+npx asciianything night-drive.mp4          # video  -> night-drive-ascii.mp4
+npx asciianything poster.png              # photo  -> poster-ascii.png
+npx asciianything frames/ --fps 60        # 3D scene frames -> frames-ascii.mp4
 ```
 
-That writes `night-drive-ascii.mp4` at the source's resolution, frame rate and duration.
+A video is written at the source's resolution, frame rate and duration; a photo is written as a single PNG at the
+photo's resolution.
 
 ```bash
 # a specific output, larger letters
@@ -125,7 +145,8 @@ npx asciianything clip.mp4 --prose my-words.txt
 | `--detail <n>` / `--color-detail <n>` | `0.14` / `0.1` | subcell luminance and colour recovery |
 | `--prose <file>` | bundled bank | `.txt` sentences or a `.json` array |
 | `--crf <n>` / `--preset <p>` | `17` / `slow` | x264 quality and speed |
-| `--still <seconds>` | — | render one PNG instead of a video |
+| `--fps <n>` | `30` | frame rate for an image-sequence input |
+| `--still <seconds>` | — | render one PNG of a video instead of the whole file |
 | `--limit <n>` | — | stop after n frames |
 | `--info` | — | print grid, cell size and measured coverage, then exit |
 
@@ -133,7 +154,7 @@ npx asciianything clip.mp4 --prose my-words.txt
 
 ```text
 asciianything/
-  src/cli.js            argument parsing, ffprobe, the decode → render → encode pipe
+  src/cli.js            argument parsing, ffprobe, video / photo / frame-sequence input
   src/render.js         sampling, weight choice, coverage division, halo, composite
   src/atlas.js          Skia glyph rasterisation and measured ink coverage
   src/prose.js          sentence bank → the fixed character grid
@@ -181,7 +202,8 @@ reshuffled text.
 
 **One frame in, one frame out.** The decoder is asked for raw RGBA at the source's native size, the renderer writes RGB,
 and the encoder is told the source's frame rate and colour tags. Frame count, duration, resolution and pixel format are
-probed on both files afterwards.
+probed on both files afterwards. A photo takes the same path with a single frame; a folder of frames is decoded at the
+`--fps` you give it.
 
 ## Verification
 

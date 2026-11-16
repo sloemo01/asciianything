@@ -9,10 +9,12 @@ const { createCanvas } = require('@napi-rs/canvas');
 const { Renderer } = require('./render');
 
 const HELP = `
-asciianything — turn a video into a mosaic of coloured lowercase prose.
+asciianything — turn anything with pixels into coloured lowercase prose.
 
 usage:
-  asciianything <input.mp4> [-o output.mp4] [options]
+  asciianything <video.mp4>            [-o out.mp4]
+  asciianything <photo.png>            [-o out.png]
+  asciianything <frames-dir/> [--fps]  [-o out.mp4]
 
 options:
   -o, --out <file>        output video (default: <input>-ascii.mp4)
@@ -32,6 +34,7 @@ options:
   --prose <file>          sentence bank (.txt or .json) instead of the bundled one
   --crf <n>               x264 quality, lower is better (default 17)
   --preset <name>         x264 preset (default slow)
+  --fps <n>               frame rate for an image-sequence input (default 30)
   --still <seconds>       render one frame to PNG instead of the whole video
   --limit <n>             only render the first n frames (preview)
   --info                  print grid and coverage stats, then exit
@@ -74,6 +77,41 @@ function probe(file) {
     fps: num / den,
     frames: Number(info.nb_frames) || 0,
     duration: Number(info.duration) || 0,
+  };
+}
+
+const IMAGE_EXT = new Set(['.png', '.jpg', '.jpeg', '.webp', '.tif', '.tiff', '.bmp', '.avif']);
+
+function probeImage(file) {
+  const res = spawnSync(
+    'ffprobe',
+    ['-v', 'error', '-select_streams', 'v:0', '-show_entries', 'stream=width,height', '-of', 'json', file],
+    { encoding: 'utf8' }
+  );
+  if (res.status !== 0) fail(`ffprobe failed on ${file}`);
+  const info = JSON.parse(res.stdout).streams[0];
+  if (!info || !info.width) fail(`no image data in ${file}`);
+  return { width: info.width, height: info.height, fps: 0, rate: '0/1', frames: 1, duration: 0 };
+}
+
+function probeSequence(dir, fps) {
+  const files = fs
+    .readdirSync(dir)
+    .filter((f) => IMAGE_EXT.has(path.extname(f).toLowerCase()))
+    .sort();
+  if (!files.length) fail(`no images in ${dir}`);
+  const first = path.join(dir, files[0]);
+  const img = probeImage(first);
+  const ext = path.extname(files[0]).toLowerCase();
+  const same = files.filter((f) => path.extname(f).toLowerCase() === ext).length;
+  return {
+    width: img.width,
+    height: img.height,
+    fps,
+    rate: `${fps}/1`,
+    frames: same,
+    duration: same / fps,
+    pattern: path.join(dir, `*${ext}`),
   };
 }
 
@@ -138,6 +176,7 @@ async function main() {
         prose: { type: 'string' },
         crf: { type: 'string' },
         preset: { type: 'string' },
+        fps: { type: 'string' },
         still: { type: 'string' },
         limit: { type: 'string' },
         info: { type: 'boolean' },
@@ -160,7 +199,10 @@ async function main() {
 
   const input = positionals[0];
   if (!fs.existsSync(input)) fail(`no such file: ${input}`);
-  const meta = probe(input);
+  const isDir = fs.statSync(input).isDirectory();
+  const isImage = !isDir && IMAGE_EXT.has(path.extname(input).toLowerCase());
+  const seqFps = Number(values.fps || 30);
+  const meta = isDir ? probeSequence(input, seqFps) : isImage ? probeImage(input) : probe(input);
   const quiet = !!values.quiet;
 
   const num = (v, d) => (v === undefined ? d : Number(v));
@@ -200,8 +242,8 @@ async function main() {
     return;
   }
 
-  if (values.still !== undefined) {
-    const at = Number(values.still);
+  if (isImage || values.still !== undefined) {
+    const at = isImage ? 0 : Number(values.still);
     const png = await renderStill(input, at, renderer, meta);
     const out = values.out || `${path.basename(input, path.extname(input))}-ascii.png`;
     fs.writeFileSync(out, png);
@@ -212,9 +254,12 @@ async function main() {
   const out = values.out || `${path.basename(input, path.extname(input))}-ascii.mp4`;
   const limit = values.limit ? Number(values.limit) : 0;
 
+  const decodeArgs = isDir
+    ? ['-v', 'error', '-framerate', String(seqFps), '-pattern_type', 'glob', '-i', meta.pattern]
+    : ['-v', 'error', '-i', input];
   const decoder = spawn(
     'ffmpeg',
-    ['-v', 'error', '-i', input, '-f', 'rawvideo', '-pix_fmt', 'rgba', '-'],
+    [...decodeArgs, '-f', 'rawvideo', '-pix_fmt', 'rgba', '-'],
     { stdio: ['ignore', 'pipe', 'pipe'] }
   );
   let decodeErr = '';
