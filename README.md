@@ -271,6 +271,8 @@ as a poster and are legible from across a room.
 
 ## Credits
 
+Effect reference: [everything is ascii](https://x.com/buildwithsid/status/2110732049661485084) by [siddharth (@buildwithsid)](https://x.com/buildwithsid) — the post that set the bar for this.
+
 Night highway footage: [Night Traffic Flow in Urban Highway View](https://www.pexels.com/video/night-traffic-flow-in-urban-highway-view-35835506/)
 by [Sururi Ballıdağ](https://www.pexels.com/@drector/), used under the [Pexels license](https://www.pexels.com/license/).
 

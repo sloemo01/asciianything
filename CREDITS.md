@@ -1,5 +1,10 @@
 # Credits
 
+## Reference
+
+**everything is ascii** — [@buildwithsid on X](https://x.com/buildwithsid/status/2110732049661485084), posted 15 Oct 2026.
+The effect this project is measured against.
+
 ## Footage
 
 **Night highway** — [Night Traffic Flow in Urban Highway View](https://www.pexels.com/video/night-traffic-flow-in-urban-highway-view-35835506/)
