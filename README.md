@@ -18,7 +18,7 @@
 
 <sub><b>Night highway</b>, 19.4 s, 1920×1080 &nbsp;·&nbsp; <b>Sunset</b>, 11.6 s, 3840×2160·60</sub>
 
-<sub>Two clips rendered by this package — the same command that turns a still photo into a PNG or a folder of three.js frames into a clip. Both are re-encoded under 25 MB so GitHub can preview them; the originals were rendered at crf 17.</sub>
+<sub>Two clips rendered by this package — the same command that turns a still photo into a PNG or a folder of three.js frames into a clip. These are 7–8 MB previews, because GitHub only inlines files under 10 MB; the full-quality renders use the settings in <a href="#demos">Demos</a>.</sub>
 
 [**Install it**](#install-it) &nbsp;·&nbsp; [**Run it**](#run-it) &nbsp;·&nbsp; [What is in here](#what-is-in-here) &nbsp;·&nbsp; [How it works](#how-it-works) &nbsp;·&nbsp; [Verification](#verification) &nbsp;·&nbsp; [Credits](#credits)
 
