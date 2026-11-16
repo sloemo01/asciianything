@@ -48,45 +48,25 @@ A small Node CLI around a deterministic renderer.
 
 ## Install it
 
-Paste this into an agent that can run shell commands. It asks where the copy should live, clones the repository, installs
-the dependency, renders a test frame and reports what it measured before it renders anything for you. The published
-package is the same code, so the agent can work from either.
+Paste this into an agent that can run shell commands. It installs the published package, proves it on a still, and
+reports what it measured before rendering anything for you.
 
 ```text
-Install asciianything here, then use it to render a video.
+Install asciianything from npm, verify it, then render a video.
 
-Repo: https://github.com/sloemo01/asciianything
-
-1. Ask me where the folder should go before downloading anything,
-   and wait for my answer. Propose ~/tools/asciianything as the default.
-   Do not pick a path silently.
-2. Download the whole repository, not just the README:
-     git clone https://github.com/sloemo01/asciianything.git "<target>"
-   Without git:
-     curl -L -o asciianything.tar.gz \
-       https://github.com/sloemo01/asciianything/archive/main.tar.gz
-     tar xzf asciianything.tar.gz && mv asciianything-main "<target>"
-3. Install and prove it:
-     cd "<target>" && npm ci
-     node src/cli.js --help
-     node src/cli.js assets/night-highway-1080p.mp4 --still 8 \
-       --font-size 10 --calibration 0.76 --halo 1.2 --halo-radius 8 \
-       -o /tmp/proof.png
-   Print the commit hash (git -C "<target>" rev-parse --short HEAD), the
-   grid size the CLI reports, and the size of /tmp/proof.png. If npm ci,
-   ffmpeg, or the still fails, say so and stop. Never describe this tool
-   from memory.
-4. Check the machine has ffmpeg and ffprobe on PATH; if not, tell me the
-   install command for my platform and stop.
-5. Report back in this order: install path and commit, the grid and glyph
-   settings, the encoder flags, and three rules from "How it works" with
-   the section each came from.
-6. Then ask me for the video to convert, and for the font size. Ask once;
-   do not interview me. Render it, probe the output with ffprobe, and show
-   me the frame count, duration and resolution next to the source's.
+1. Confirm node 18+ and ffmpeg/ffprobe are on PATH. If either is missing, give
+   me the install command for my platform and stop.
+2. npm i -g asciianything          (one-off runs also work with npx asciianything)
+3. Prove it before describing it:
+     asciianything --help
+     asciianything <any.mp4> --still 8 -o /tmp/proof.png
+   Print the version, the grid the CLI reports and the size of proof.png. If a
+   step fails, say so and stop. Never describe the tool from memory.
+4. Report in this order: version, grid and glyph size, encoder flags, then three
+   rules from "How it works" with the section each came from.
+5. Ask me for the video and the font size once, render it, and probe the output
+   with ffprobe next to the source: frames, duration, resolution.
 ```
-
-Or skip the repository entirely:
 
 ```bash
 npx asciianything night-drive.mp4          # one clip, no install
@@ -98,19 +78,12 @@ Node 18+ and `ffmpeg` / `ffprobe` are the only requirements.
 ### Update it
 
 ```text
-Update my asciianything install, then report what changed.
+Update asciianything, then report what changed.
 
-1. Ask me for the folder before touching anything, and wait.
-2. Print the current commit, then make the update reversible:
-     git -C "<target>" rev-parse --short HEAD
-     git -C "<target>" diff > my-changes.patch
-     cp -R "<target>" "<target>.bak"
-3. Pull the latest main:
-     git -C "<target>" pull --ff-only
-     cd "<target>" && npm ci
-4. Diff the CLI help and the README changelog before and after, and tell
-   me what new flags or defaults appeared. Do not re-render anything yet.
-5. If the build or a test still fails, restore "<target>.bak" and say so.
+1. Print the current version and --help.
+2. npm i -g asciianything@latest
+3. Diff the old and new --help, list new flags or changed defaults, and stop
+   before re-rendering anything. If the install fails, say so.
 ```
 
 ## Run it
