@@ -17,10 +17,10 @@
 </p>
 <p>
 <a href="https://cdn.jsdelivr.net/gh/sloemo01/asciianything@main/assets/aurora-1080p.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/aurora-1080p.jpg" width="48%" alt="Aurora over snowy cabins in ASCII prose, 1920x1080"></a>
-<a href="https://cdn.jsdelivr.net/gh/sloemo01/asciianything@main/assets/empire-state-1080p.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/empire-state-1080p.jpg" width="48%" alt="Empire State Building view in ASCII prose, 1920x1080"></a>
+<a href="https://cdn.jsdelivr.net/gh/sloemo01/asciianything@main/assets/new-york-1080p.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/new-york-1080p.jpg" width="48%" alt="New York skyline with fireworks in ASCII prose, 1920x1080"></a>
 </p>
 
-<sub><b>Night highway</b>, 19.4 s, 1920×1080 &nbsp;·&nbsp; <b>Sunset</b>, 11.6 s, 3840×2160·60 &nbsp;·&nbsp; <b>Aurora</b>, 11.9 s, 1920×1080 &nbsp;·&nbsp; <b>Empire State</b>, 9.7 s, 1920×1080</sub>
+<sub><b>Night highway</b>, 19.4 s, 1920×1080 &nbsp;·&nbsp; <b>Sunset</b>, 11.6 s, 3840×2160·60 &nbsp;·&nbsp; <b>Aurora</b>, 7.6 s, 1920×1080 &nbsp;·&nbsp; <b>New York</b>, 16.0 s, 1920×1080</sub>
 
 <sub>Four clips rendered by this package — the same command that turns a still photo into a PNG or a folder of three.js frames into a clip. Click a tile to play: GitHub refuses to inline video in the blob view at any size, so the tiles stream the 7–8 MB copies from <code>assets/</code> through jsDelivr. The full-quality renders use the settings in <a href="#demos">Demos</a>.</sub>
 
@@ -176,8 +176,8 @@ asciianything/
   assets/
     JetBrainsMono-Variable.ttf   the bundled mono, weight axis 100–800
     prose.json                  1,844 sentences for the night-highway clips
-    prose-aurora.txt            40 sentences for the aurora clip
-    prose-city.txt              40 sentences for the Empire State clip
+    prose-aurora.txt            35 sentences for the aurora clip
+    prose-city.txt              35 sentences for the New York clip
     OFL.txt                     the font licence
     night-highway-1080p.mp4     demo, 19.4 s, 1920×1080
     sunset-ascii.mp4            demo, 11.6 s, 3840×2160·60
@@ -250,14 +250,14 @@ npx asciianything night-1080p.mp4 --font-size 10 --calibration 0.76 \
 npx asciianything sunset.mp4 --font-size 17 --calibration 0.8025 \
   --halo 1.7 --halo-radius 14 --prose sunset-prose.txt -o sunset-ascii.mp4
 
-# aurora over snowy cabins, 1920x1080, 178 frames, 40-sentence aurora bank,
-# with the source's near-black sky crushed to zero first so the field stays clean
-npx asciianything aurora.mp4 --font-size 10 --calibration 0.82 \
+# aurora over a fishing harbour, 1920x1080, 189 frames, 35-sentence aurora bank;
+# the source's near-black sky is crushed to zero first so the field stays clean
+npx asciianything aurora.mp4 --font-size 10 --calibration 0.78 \
   --prose prose-aurora.txt -o aurora-1080p.mp4
 
-# Empire State view, 4K source scaled to 1920x1080, 291 frames, city bank
-npx asciianything esb.mp4 --font-size 10 --calibration 0.68 \
-  --prose prose-city.txt -o empire-state-1080p.mp4
+# New York skyline with fireworks, 4K source scaled to 1920x1080, 481 frames
+npx asciianything new-york.mp4 --font-size 10 --calibration 0.70 \
+  --halo 1.5 --halo-radius 10 --prose prose-city.txt -o new-york-1080p.mp4
 ```
 
 The bundled bank (`assets/prose.json`) holds 1,844 deterministic sentences about night highways, sodium light and distant
@@ -278,9 +278,9 @@ by [Sururi Ballıdağ](https://www.pexels.com/@drector/), used under the [Pexels
 
 Sunset footage: [Stunning Beach Sunset with Vibrant Colors](https://www.pexels.com/video/stunning-beach-sunset-with-vibrant-colors-29045884/) by [Manoo Media](https://www.pexels.com/@manoo-media-65214113/), used under the [Pexels license](https://www.pexels.com/license/).
 
-Aurora footage: [Aurora Borealis Over Snowy Cabins at Night](https://www.pexels.com/video/aurora-borealis-over-snowy-cabins-at-night-31401354/) by [Utkarsh Malviya](https://www.pexels.com/@utkarsh-malviya-2148004873/), used under the [Pexels license](https://www.pexels.com/license/).
+Aurora footage: [Aurora Borealis Forms in the Sky](https://www.pexels.com/video/aurora-borealis-forms-in-the-sky-5700940/) by [Nico Becker](https://www.pexels.com/@nicobecker/), used under the [Pexels license](https://www.pexels.com/license/).
 
-Empire State footage: [Stunning Aerial View of New York City Skyscrapers](https://www.pexels.com/video/stunning-aerial-view-of-new-york-city-skyscrapers-36244264/) by [Yura Forrat](https://www.pexels.com/@yuraforrat/), used under the [Pexels license](https://www.pexels.com/license/).
+New York footage: [Fireworks Over New York Skyline at Night](https://www.pexels.com/video/fireworks-over-new-york-skyline-at-night-38103693/) by [Yura Forrat](https://www.pexels.com/@yuraforrat/), used under the [Pexels license](https://www.pexels.com/license/).
 
 Bundled typeface: [JetBrains Mono](https://github.com/JetBrains/JetBrainsMono), SIL OFL 1.1 — see `assets/OFL.txt`.
 

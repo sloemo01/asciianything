@@ -13,16 +13,16 @@ by [Manoo Media](https://www.pexels.com/@manoo-media-65214113/).
 Source file `12556562_3840_2160_60fps.mp4`, 3840 × 2160, 60 fps, 11.57 s.
 Used under the [Pexels license](https://www.pexels.com/license/). `assets/sunset-ascii.mp4` is the ASCII derivative.
 
-**Aurora** — [Aurora Borealis Over Snowy Cabins at Night](https://www.pexels.com/video/aurora-borealis-over-snowy-cabins-at-night-31401354/)
-by [Utkarsh Malviya](https://www.pexels.com/@utkarsh-malviya-2148004873/).
-Source file `31401354`, 1920 × 1080, 15 fps, 11.87 s. Used under the [Pexels license](https://www.pexels.com/license/).
-`assets/aurora-1080p.mp4` is the ASCII derivative; the source's black point was crushed before rendering so the night sky
-stays clean.
+**Aurora** — [Aurora Borealis Forms in the Sky](https://www.pexels.com/video/aurora-borealis-forms-in-the-sky-5700940/)
+by [Nico Becker](https://www.pexels.com/@nicobecker/).
+Source file `5700940-uhd_3840_2160_25fps.mp4`, 3840 × 2160, 25 fps, 7.57 s, scaled to 1920 × 1080 before rendering.
+Used under the [Pexels license](https://www.pexels.com/license/). `assets/aurora-1080p.mp4` is the ASCII derivative; the
+source's black point was crushed before rendering so the night sky stays clean.
 
-**Empire State** — [Stunning Aerial View of New York City Skyscrapers](https://www.pexels.com/video/stunning-aerial-view-of-new-york-city-skyscrapers-36244264/)
+**New York** — [Fireworks Over New York Skyline at Night](https://www.pexels.com/video/fireworks-over-new-york-skyline-at-night-38103693/)
 by [Yura Forrat](https://www.pexels.com/@yuraforrat/).
-Source file `36244264`, 3840 × 2160, 30 fps, 9.70 s, scaled to 1920 × 1080 before rendering.
-Used under the [Pexels license](https://www.pexels.com/license/). `assets/empire-state-1080p.mp4` is the ASCII derivative.
+Source file `16183841_3840_2160_30fps.mp4`, 3840 × 2160, 30 fps, 16.03 s, scaled to 1920 × 1080 before rendering.
+Used under the [Pexels license](https://www.pexels.com/license/). `assets/new-york-1080p.mp4` is the ASCII derivative.
 
 The Pexels license allows free use, including commercial use and modification, without attribution.
 The credits above are given because the footage is the other half of these renders, not because the licence demands it.
@@ -36,8 +36,8 @@ licensed under the SIL Open Font License 1.1. The variable font is bundled at
 ## Prose
 
 The bundled sentence banks were written for this project: `assets/prose.json` (1,844 sentences) for the
-night-highway clips, `assets/prose-aurora.txt` (40) for the aurora, `assets/prose-city.txt` (40) for the
-Empire State clip, and a separate 256-sentence bank for the sunset. None is sampled from another work.
+night-highway clips, `assets/prose-aurora.txt` (35) for the aurora, `assets/prose-city.txt` (35) for the
+New York clip, and a separate 256-sentence bank for the sunset. None is sampled from another work.
 
 ## Code
 
