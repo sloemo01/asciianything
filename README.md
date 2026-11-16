@@ -47,8 +47,15 @@ behind Puppeteer or Playwright, or any headless capture), then point the tool at
 with `--fps`; resolution comes from the frames. The same path handles Blender renders, stop-motion stills, screen
 recordings split to frames, and anything else that can write `0001.png`.
 
-A single photo is rendered and encoded as one PNG — the still path shares the renderer, the atlas and the calibration
-with the video path, so a photo and a frame of a clip at the same size match exactly.
+**Exact by construction.** A photo is one frame of the same pipeline: the decoder flags, the renderer call, the atlas and
+the calibration are the video path with a single frame in it. `asciianything shot.png` and frame 0 of a clip made from
+`shot.png` are byte-identical — measured at 0 differing pixels on a 3840×2160 frame.
+
+Output size always equals input size, odd dimensions included: a 1001×667 frame encodes as 1001×667, with the encoder
+switching to `yuv444p` automatically because `yuv420p` needs even dimensions. Video at the default `--crf 17` is lossy on
+purpose (that is what makes a 19-second 1080p clip 54 MB); `--crf 0 --pix-fmt yuv444p` keeps the decoded frame within ±2
+levels of the rendered RGB, which is the rounding of the RGB→YUV→RGB matrix and nothing else. Photos are always written
+as exact PNG.
 
 ## What it is
 
@@ -144,7 +151,8 @@ npx asciianything clip.mp4 --prose my-words.txt
 | `--diffusion-adaptive <n>` | `0.25` | extra softening for bright cells |
 | `--detail <n>` / `--color-detail <n>` | `0.14` / `0.1` | subcell luminance and colour recovery |
 | `--prose <file>` | bundled bank | `.txt` sentences or a `.json` array |
-| `--crf <n>` / `--preset <p>` | `17` / `slow` | x264 quality and speed |
+| `--crf <n>` / `--preset <p>` | `17` / `slow` | x264 quality and speed — `--crf 0` is lossless |
+| `--pix-fmt <fmt>` | `yuv420p` (`yuv444p` when odd) | encoder pixel format; `yuv444p` keeps full chroma |
 | `--fps <n>` | `30` | frame rate for an image-sequence input |
 | `--still <seconds>` | — | render one PNG of a video instead of the whole file |
 | `--limit <n>` | — | stop after n frames |
@@ -216,6 +224,9 @@ Measured against the sources after encoding, in linear light, one-cell blur:
 
 Frame counts, durations, dimensions and colour tags are probed independently after encoding. The sunset run additionally
 holds every measured region — top sky, cirrus, cloud fan, sea band, wet sand, rocks — inside ±1.6 %.
+
+Two more exactness checks: the photo path against frame 0 of a clip of the same image gives **0 differing pixels**, and a
+`--crf 0 --pix-fmt yuv444p` encode of that frame decodes back within **±2 levels** of the rendered RGB.
 
 ## Demos
 

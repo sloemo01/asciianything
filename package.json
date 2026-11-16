@@ -1,6 +1,6 @@
 {
   "name": "asciianything",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Turn a 3D scene, a video or a photo into a mosaic of coloured lowercase prose \u2014 frame-accurate, with ffmpeg.",
   "keywords": [
     "ascii",

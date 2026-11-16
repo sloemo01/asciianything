@@ -32,7 +32,8 @@ options:
   --detail <n>            subcell luminance detail recovery (default 0.14)
   --color-detail <n>      subcell colour recovery (default 0.1)
   --prose <file>          sentence bank (.txt or .json) instead of the bundled one
-  --crf <n>               x264 quality, lower is better (default 17)
+  --crf <n>               x264 quality, lower is better, 0 = lossless (default 17)
+  --pix-fmt <fmt>         encoder pixel format: yuv420p or yuv444p (default yuv420p)
   --preset <name>         x264 preset (default slow)
   --fps <n>               frame rate for an image-sequence input (default 30)
   --still <seconds>       render one frame to PNG instead of the whole video
@@ -175,6 +176,7 @@ async function main() {
         'color-detail': { type: 'string' },
         prose: { type: 'string' },
         crf: { type: 'string' },
+        'pix-fmt': { type: 'string' },
         preset: { type: 'string' },
         fps: { type: 'string' },
         still: { type: 'string' },
@@ -254,6 +256,14 @@ async function main() {
   const out = values.out || `${path.basename(input, path.extname(input))}-ascii.mp4`;
   const limit = values.limit ? Number(values.limit) : 0;
 
+  // yuv420p needs even dimensions; pick 4:4:4 automatically when they are odd
+  // so an odd-sized frame sequence still encodes at its exact size.
+  const even = meta.width % 2 === 0 && meta.height % 2 === 0;
+  const pixFmt = values['pix-fmt'] || (even ? 'yuv420p' : 'yuv444p');
+  if (!even && !values['pix-fmt'] && !quiet) {
+    console.error(`${meta.width}x${meta.height} is odd: encoding yuv444p (yuv420p needs even sizes)`);
+  }
+
   const decodeArgs = isDir
     ? ['-v', 'error', '-framerate', String(seqFps), '-pattern_type', 'glob', '-i', meta.pattern]
     : ['-v', 'error', '-i', input];
@@ -276,7 +286,7 @@ async function main() {
       '-vf', 'scale=out_color_matrix=bt709',
       '-colorspace', 'bt709', '-color_primaries', 'bt709', '-color_trc', 'bt709', '-color_range', 'tv',
       '-an', '-c:v', 'libx264', '-preset', values.preset || 'slow',
-      '-crf', String(num(values.crf, 17)), '-pix_fmt', 'yuv420p',
+      '-crf', String(num(values.crf, 17)), '-pix_fmt', pixFmt,
       '-movflags', '+faststart', out,
     ],
     { stdio: ['pipe', 'inherit', 'inherit'] }
@@ -300,7 +310,12 @@ async function main() {
     }
     encoder.stdin.end();
     const code = await new Promise((resolve) => encoder.on('close', resolve));
-    if (code !== 0) fail(`encoder exited with ${code}`);
+    if (code !== 0) {
+      fail(
+        `encoder exited with ${code}. For odd frame sizes or exact colour try ` +
+          `--pix-fmt yuv444p (and --crf 0 for a lossless encode).`
+      );
+    }
     if (decodeErr.trim() && !limit) fail(`decoder reported: ${decodeErr.split('\n')[0]}`);
   } finally {
     decoder.kill();
@@ -312,10 +327,14 @@ async function main() {
   }
 }
 
+// One frame, decoded exactly as the video decoder decodes them: same flags,
+// same pixel format, same renderer call. A photo is simply a source with one
+// frame, so its output is byte-identical to frame 0 of a clip of that image.
 async function renderStill(input, at, renderer, meta) {
+  const seek = at > 0 ? ['-ss', String(at)] : [];
   const res = spawnSync(
     'ffmpeg',
-    ['-v', 'error', '-ss', String(at), '-i', input, '-frames:v', '1', '-f', 'rawvideo', '-pix_fmt', 'rgba', '-'],
+    ['-v', 'error', ...seek, '-i', input, '-frames:v', '1', '-f', 'rawvideo', '-pix_fmt', 'rgba', '-'],
     { maxBuffer: meta.width * meta.height * 4 * 2 }
   );
   if (res.status !== 0) fail('could not decode the frame for --still');
