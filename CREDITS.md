@@ -16,7 +16,7 @@ Used under the [Pexels license](https://www.pexels.com/license/). `assets/sunset
 **Aurora** — [Aurora Borealis Forms in the Sky](https://www.pexels.com/video/aurora-borealis-forms-in-the-sky-5700940/)
 by [Nico Becker](https://www.pexels.com/@nicobecker/).
 Source file `5700940-uhd_3840_2160_25fps.mp4`, 3840 × 2160, 25 fps, 7.57 s, scaled to 1920 × 1080 before rendering.
-Used under the [Pexels license](https://www.pexels.com/license/). `assets/aurora-1080p.mp4` is the ASCII derivative; the
+Used under the [Pexels license](https://www.pexels.com/license/). `assets/aurora-harbour-1080p.mp4` is the ASCII derivative; the
 source's black point was crushed before rendering so the night sky stays clean.
 
 **New York** — [Fireworks Over New York Skyline at Night](https://www.pexels.com/video/fireworks-over-new-york-skyline-at-night-38103693/)

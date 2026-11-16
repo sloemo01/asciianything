@@ -16,7 +16,7 @@
 <a href="https://cdn.jsdelivr.net/gh/sloemo01/asciianything@main/assets/sunset-ascii.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/sunset.jpg" width="48%" alt="Sunset in ASCII prose, 3840x2160 at 60 fps"></a>
 </p>
 <p>
-<a href="https://cdn.jsdelivr.net/gh/sloemo01/asciianything@main/assets/aurora-1080p.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/aurora-1080p.jpg" width="48%" alt="Aurora over snowy cabins in ASCII prose, 1920x1080"></a>
+<a href="https://cdn.jsdelivr.net/gh/sloemo01/asciianything@main/assets/aurora-harbour-1080p.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/aurora-harbour-1080p.jpg" width="48%" alt="Aurora over snowy cabins in ASCII prose, 1920x1080"></a>
 <a href="https://cdn.jsdelivr.net/gh/sloemo01/asciianything@main/assets/new-york-1080p.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/new-york-1080p.jpg" width="48%" alt="New York skyline with fireworks in ASCII prose, 1920x1080"></a>
 </p>
 
@@ -253,7 +253,7 @@ npx asciianything sunset.mp4 --font-size 17 --calibration 0.8025 \
 # aurora over a fishing harbour, 1920x1080, 189 frames, 35-sentence aurora bank;
 # the source's near-black sky is crushed to zero first so the field stays clean
 npx asciianything aurora.mp4 --font-size 10 --calibration 0.78 \
-  --prose prose-aurora.txt -o aurora-1080p.mp4
+  --prose prose-aurora.txt -o aurora-harbour-1080p.mp4
 
 # New York skyline with fireworks, 4K source scaled to 1920x1080, 481 frames
 npx asciianything new-york.mp4 --font-size 10 --calibration 0.70 \
