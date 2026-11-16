@@ -247,7 +247,11 @@ async function main() {
   if (isImage || values.still !== undefined) {
     const at = isImage ? 0 : Number(values.still);
     const png = await renderStill(input, at, renderer, meta);
-    const out = values.out || `${path.basename(input, path.extname(input))}-ascii.png`;
+    let out = values.out || `${path.basename(input, path.extname(input))}-ascii.png`;
+    if (path.extname(out).toLowerCase() !== '.png') {
+      out = `${out.slice(0, out.length - path.extname(out).length)}.png`;
+      if (!quiet) console.error(`one frame: writing PNG -> ${out}`);
+    }
     fs.writeFileSync(out, png);
     if (!quiet) console.error(`wrote ${out}`);
     return;

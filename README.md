@@ -39,7 +39,7 @@ emitted colour. No zoom, pan, transition, grain or vignette is ever added.
 | input | command | output |
 | --- | --- | --- |
 | video — mp4, mov, webm, gif, anything ffmpeg decodes | `asciianything clip.mp4` | `clip-ascii.mp4` |
-| photo — png, jpg, webp, avif, tiff, bmp | `asciianything shot.jpg` | `shot-ascii.png` |
+| photo — png, jpg, webp, avif, tiff, bmp | `asciianything shot.jpg` | `shot-ascii.png` (a PNG whatever `-o` says) |
 | frame sequence — a folder of numbered PNGs | `asciianything frames/ --fps 60` | `frames-ascii.mp4` |
 
 **3D scenes.** A three.js scene is a frame sequence waiting to happen: render it to PNGs (`renderer.render()` in a loop
