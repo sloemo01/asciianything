@@ -16,7 +16,7 @@
 <a href="https://cdn.jsdelivr.net/gh/sloemo01/asciianything@main/assets/sunset-ascii.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/sunset.jpg" width="48%" alt="Sunset in ASCII prose, 3840x2160 at 60 fps"></a>
 </p>
 <p>
-<a href="https://cdn.jsdelivr.net/gh/sloemo01/asciianything@main/assets/aurora-harbour-1080p.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/aurora-harbour-1080p.jpg" width="48%" alt="Aurora over snowy cabins in ASCII prose, 1920x1080"></a>
+<a href="https://cdn.jsdelivr.net/gh/sloemo01/asciianything@main/assets/aurora-harbour-1080p.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/aurora-harbour-1080p.jpg" width="48%" alt="Aurora over a fishing harbour in ASCII prose, 1920x1080"></a>
 <a href="https://cdn.jsdelivr.net/gh/sloemo01/asciianything@main/assets/new-york-1080p.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/new-york-1080p.jpg" width="48%" alt="New York skyline with fireworks in ASCII prose, 1920x1080"></a>
 </p>
 
