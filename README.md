@@ -4,10 +4,12 @@
 
 **A video rebuilt from coloured lowercase prose. One command, every frame, at the source's own resolution and frame rate.**
 
+[![Stars](https://img.shields.io/github/stars/sloemo01/asciianything?style=flat-square&color=1d1d1f&logo=github&label=stars)](https://github.com/sloemo01/asciianything/stargazers)
+[![Forks](https://img.shields.io/github/forks/sloemo01/asciianything?style=flat-square&color=1d1d1f&label=forks)](https://github.com/sloemo01/asciianything/forks)
+[![Watchers](https://img.shields.io/github/watchers/sloemo01/asciianything?style=flat-square&color=1d1d1f&label=watchers)](https://github.com/sloemo01/asciianything/watchers)
+[![License](https://img.shields.io/github/license/sloemo01/asciianything?style=flat-square&color=1d1d1f)](LICENSE)
 [![npm](https://img.shields.io/npm/v/asciianything?style=flat-square&color=1d1d1f&logo=npm&logoColor=white)](https://www.npmjs.com/package/asciianything)
 [![downloads](https://img.shields.io/npm/dm/asciianything?style=flat-square&color=1d1d1f&label=downloads)](https://www.npmjs.com/package/asciianything)
-[![stars](https://img.shields.io/github/stars/sloemo01/asciianything?style=flat-square&color=1d1d1f&logo=github&label=stars)](https://github.com/sloemo01/asciianything/stargazers)
-[![license](https://img.shields.io/github/license/sloemo01/asciianything?style=flat-square&color=1d1d1f)](LICENSE)
 [![node](https://img.shields.io/badge/node-%E2%89%A518-1d1d1f?style=flat-square)](package.json)
 
 <p>
@@ -19,7 +21,7 @@
 
 <sub>Two clips rendered by this package. Click a tile for the MP4.</sub>
 
-[**Run it**](#run-it) &nbsp;·&nbsp; [What it is](#what-it-is) &nbsp;·&nbsp; [Options](#options) &nbsp;·&nbsp; [How it works](#how-it-works) &nbsp;·&nbsp; [Verification](#verification)
+[**Install it**](#install-it) &nbsp;·&nbsp; [**Run it**](#run-it) &nbsp;·&nbsp; [What is in here](#what-is-in-here) &nbsp;·&nbsp; [How it works](#how-it-works) &nbsp;·&nbsp; [Verification](#verification) &nbsp;·&nbsp; [Credits](#credits)
 
 </div>
 
@@ -45,14 +47,80 @@ A small Node CLI around a deterministic renderer.
 - **Zero disk churn.** Raw frames are piped from `ffmpeg` into the renderer and straight into `libx264`; no PNG sequence
   is ever written.
 
+## Install it
+
+Paste this into an agent that can run shell commands. It asks where the copy should live, clones the repository, installs
+the dependency, renders a test frame and reports what it measured before it renders anything for you. The published
+package is the same code, so the agent can work from either.
+
+```text
+Install asciianything here, then use it to render a video.
+
+Repo: https://github.com/sloemo01/asciianything
+
+1. Ask me where the folder should go before downloading anything,
+   and wait for my answer. Propose ~/tools/asciianything as the default.
+   Do not pick a path silently.
+2. Download the whole repository, not just the README:
+     git clone https://github.com/sloemo01/asciianything.git "<target>"
+   Without git:
+     curl -L -o asciianything.tar.gz \
+       https://github.com/sloemo01/asciianything/archive/main.tar.gz
+     tar xzf asciianything.tar.gz && mv asciianything-main "<target>"
+3. Install and prove it:
+     cd "<target>" && npm ci
+     node src/cli.js --help
+     node src/cli.js assets/night-highway-1080p.mp4 --still 8 \
+       --font-size 10 --calibration 0.76 --halo 1.2 --halo-radius 8 \
+       -o /tmp/proof.png
+   Print the commit hash (git -C "<target>" rev-parse --short HEAD), the
+   grid size the CLI reports, and the size of /tmp/proof.png. If npm ci,
+   ffmpeg, or the still fails, say so and stop. Never describe this tool
+   from memory.
+4. Check the machine has ffmpeg and ffprobe on PATH; if not, tell me the
+   install command for my platform and stop.
+5. Report back in this order: install path and commit, the grid and glyph
+   settings, the encoder flags, and three rules from "How it works" with
+   the section each came from.
+6. Then ask me for the video to convert, and for the font size. Ask once;
+   do not interview me. Render it, probe the output with ffprobe, and show
+   me the frame count, duration and resolution next to the source's.
+```
+
+Or skip the repository entirely:
+
+```bash
+npx asciianything night-drive.mp4          # one clip, no install
+npm i -g asciianything                     # or keep it on PATH
+```
+
+Node 18+ and `ffmpeg` / `ffprobe` are the only requirements.
+
+### Update it
+
+```text
+Update my asciianything install, then report what changed.
+
+1. Ask me for the folder before touching anything, and wait.
+2. Print the current commit, then make the update reversible:
+     git -C "<target>" rev-parse --short HEAD
+     git -C "<target>" diff > my-changes.patch
+     cp -R "<target>" "<target>.bak"
+3. Pull the latest main:
+     git -C "<target>" pull --ff-only
+     cd "<target>" && npm ci
+4. Diff the CLI help and the README changelog before and after, and tell
+   me what new flags or defaults appeared. Do not re-render anything yet.
+5. If the build or a test still fails, restore "<target>.bak" and say so.
+```
+
 ## Run it
 
 ```bash
 npx asciianything night-drive.mp4
 ```
 
-That writes `night-drive-ascii.mp4` at the source's resolution, frame rate and duration. Node 18+ and `ffmpeg` /
-`ffprobe` on `PATH` are the only requirements.
+That writes `night-drive-ascii.mp4` at the source's resolution, frame rate and duration.
 
 ```bash
 # a specific output, larger letters
@@ -89,6 +157,28 @@ npx asciianything clip.mp4 --prose my-words.txt
 | `--limit <n>` | — | stop after n frames |
 | `--info` | — | print grid, cell size and measured coverage, then exit |
 
+## What is in here
+
+```text
+asciianything/
+  src/cli.js            argument parsing, ffprobe, the decode → render → encode pipe
+  src/render.js         sampling, weight choice, coverage division, halo, composite
+  src/atlas.js          Skia glyph rasterisation and measured ink coverage
+  src/prose.js          sentence bank → the fixed character grid
+  assets/
+    JetBrainsMono-Variable.ttf   the bundled mono, weight axis 100–800
+    prose.json                  1,844 sentences for the night-highway clips
+    OFL.txt                     the font licence
+    night-highway-1080p.mp4     demo, 19.4 s, 1920×1080
+    sunset-ascii.mp4            demo, 11.6 s, 3840×2160·60
+  .github/workflows/publish.yml npm publish on release, with provenance
+  CREDITS.md            footage and typeface sourcing
+  LICENSE               MIT
+```
+
+`src/` is the whole tool; everything else is either a demo or a licence. There is no build step — the CLI runs from
+source.
+
 ## How it works
 
 **A glyph inks only part of its cell, so the colour is divided by that part.** Drawing the sampled source colour into a
@@ -117,6 +207,10 @@ sand and rock are untouched. It is off by default.
 offset, and the character grid is frozen for the whole clip. Motion in the output is the source's motion, sampled — never
 reshuffled text.
 
+**One frame in, one frame out.** The decoder is asked for raw RGBA at the source's native size, the renderer writes RGB,
+and the encoder is told the source's frame rate and colour tags. Frame count, duration, resolution and pixel format are
+probed on both files afterwards.
+
 ## Verification
 
 Measured against the sources after encoding, in linear light, one-cell blur:
@@ -131,7 +225,7 @@ holds every measured region — top sky, cirrus, cloud fan, sea band, wet sand, 
 
 ## Demos
 
-The three clips above are rendered with this package:
+Both clips above are rendered with this package:
 
 ```bash
 # 1920x1080, cropped from a 1440x2560 source, 582 frames at 29.97 fps
