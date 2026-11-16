@@ -18,7 +18,7 @@
 
 <sub><b>Night highway</b>, 19.4 s, 1920×1080 &nbsp;·&nbsp; <b>Sunset</b>, 11.6 s, 3840×2160·60</sub>
 
-<sub>Two clips rendered by this package — the same command that turns a still photo into a PNG or a folder of three.js frames into a clip.</sub>
+<sub>Two clips rendered by this package — the same command that turns a still photo into a PNG or a folder of three.js frames into a clip. Both are re-encoded under 25 MB so GitHub can preview them; the originals were rendered at crf 17.</sub>
 
 [**Install it**](#install-it) &nbsp;·&nbsp; [**Run it**](#run-it) &nbsp;·&nbsp; [What is in here](#what-is-in-here) &nbsp;·&nbsp; [How it works](#how-it-works) &nbsp;·&nbsp; [Verification](#verification) &nbsp;·&nbsp; [Credits](#credits)
 
@@ -32,7 +32,9 @@ This is not an `@%#*+=-:.` brightness ramp, and it is not text laid over a pictu
 frame comes out, and the only things that change between frames are scene colour, sampled luminance, glyph weight and
 emitted colour. No zoom, pan, transition, grain or vignette is ever added.
 
-![source and output, same frame](https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/sunset-comparison.jpg)
+![the source frame above, the same crop rendered in prose below, 1:1](https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/sunset-comparison.jpg)
+
+<sub><b>Top:</b> the source frame. <b>Bottom:</b> the same 880×495 crop rendered, at 1:1 — every letter readable, no downscale.</sub>
 
 ## What it converts
 
