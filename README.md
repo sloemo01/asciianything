@@ -34,7 +34,7 @@ This is not an `@%#*+=-:.` brightness ramp, and it is not text laid over a pictu
 frame comes out, and the only things that change between frames are scene colour, sampled luminance, glyph weight and
 emitted colour. No zoom, pan, transition, grain or vignette is ever added.
 
-![the source crop on the left, the same crop in prose on the right, 1:1](https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/sunset-comparison.jpg?v=2)
+![the source crop on the left, the same crop in prose on the right, 1:1](https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/sunset-comparison-wide.jpg)
 
 <sub><b>Left:</b> the source frame. <b>Right:</b> the same 440×248 crop rendered, at 1:1 — every letter readable, no downscale.</sub>
 
