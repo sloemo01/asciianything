@@ -11,14 +11,13 @@
 [![node](https://img.shields.io/badge/node-%E2%89%A518-1d1d1f?style=flat-square)](package.json)
 
 <p>
-<a href="assets/night-highway-1080p.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/night-highway-1080p.jpg" width="32%" alt="Night highway in ASCII prose, 1920x1080"></a>
-<a href="assets/sunset-ascii.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/sunset.jpg" width="32%" alt="Sunset in ASCII prose, 3840x2160 at 60 fps"></a>
-<a href="assets/demo.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/portrait.jpg" width="32%" alt="Night highway in ASCII prose, vertical 1440x2560"></a>
+<a href="assets/night-highway-1080p.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/night-highway-1080p.jpg" width="48%" alt="Night highway in ASCII prose, 1920x1080"></a>
+<a href="assets/sunset-ascii.mp4"><img src="https://raw.githubusercontent.com/sloemo01/asciianything/main/assets/sunset.jpg" width="48%" alt="Sunset in ASCII prose, 3840x2160 at 60 fps"></a>
 </p>
 
-<sub><b>Night highway</b>, 19.4 s, 1920×1080 &nbsp;·&nbsp; <b>Sunset</b>, 11.6 s, 3840×2160·60 &nbsp;·&nbsp; <b>Night highway</b>, 19.4 s, 1440×2560</sub>
+<sub><b>Night highway</b>, 19.4 s, 1920×1080 &nbsp;·&nbsp; <b>Sunset</b>, 11.6 s, 3840×2160·60</sub>
 
-<sub>Three clips rendered by this package. Click a tile for the MP4.</sub>
+<sub>Two clips rendered by this package. Click a tile for the MP4.</sub>
 
 [**Run it**](#run-it) &nbsp;·&nbsp; [What it is](#what-it-is) &nbsp;·&nbsp; [Options](#options) &nbsp;·&nbsp; [How it works](#how-it-works) &nbsp;·&nbsp; [Verification](#verification)
 
@@ -125,7 +124,6 @@ Measured against the sources after encoding, in linear light, one-cell blur:
 | clip | grid | whole-frame luminance | settings |
 | --- | --- | --- | --- |
 | night highway · 1920×1080 | 320 × 99 (31,680) | +2.5 % | `--font-size 10 --calibration 0.76 --halo 1.2 --halo-radius 8` |
-| night highway · 1440×2560 | 120 × 117 (14,040) | +0.5 … +7 % | `--font-size 20`, six sampled times |
 | sunset · 3840×2160·60 | 384 × 114 (43,776) | +0.9 % | `--font-size 17 --calibration 0.8025 --halo 1.7 --halo-radius 14` |
 
 Frame counts, durations, dimensions and colour tags are probed independently after encoding. The sunset run additionally

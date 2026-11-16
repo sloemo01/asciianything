@@ -5,8 +5,8 @@
 **Night highway** — [Night Traffic Flow in Urban Highway View](https://www.pexels.com/video/night-traffic-flow-in-urban-highway-view-35835506/)
 by [Sururi Ballıdağ](https://www.pexels.com/@drector/) (İstanbul).
 Source file `15195617_1440_2560_30fps.mp4`, 1440 × 2560, 29.97 fps, 19.42 s.
-Used under the [Pexels license](https://www.pexels.com/license/). The clips in `assets/demo.mp4` and
-`assets/night-highway-1080p.mp4` are ASCII derivatives of it; the 1080p version is a 16:9 crop of the vertical original.
+Used under the [Pexels license](https://www.pexels.com/license/). `assets/night-highway-1080p.mp4` is the
+ASCII derivative of it: a 16:9 crop of the vertical original, rendered at 1920 × 1080.
 
 **Sunset** — [Stunning Beach Sunset with Vibrant Colors](https://www.pexels.com/video/stunning-beach-sunset-with-vibrant-colors-29045884/)
 by [Manoo Media](https://www.pexels.com/@manoo-media-65214113/).
